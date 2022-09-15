@@ -1,4 +1,4 @@
-# Next.js Typescript Chakra-UI starter
+# Todo-Able
 
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)]()
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
