@@ -16,13 +16,13 @@ const Login = () => {
 	const passwordRef = useRef<HTMLInputElement>(null)
 	const confirmPasswordRef = useRef<HTMLInputElement>(null)
 	const { colorMode } = useColorMode()
-	const isDark = colorMode === 'dark'
+	const isDarkMode = colorMode === 'dark'
 
 	return (
 		<Flex justify={'center'} align={'center'} h={'calc(100vh - 72px)'}>
 			<Flex
 				data-testid='login-container'
-				bg={isDark ? 'brand.paper.dark' : 'brand.paper.light'}
+				bg={isDarkMode ? 'brand.paper.dark' : 'brand.paper.light'}
 				w={350}
 				borderRadius={'lg'}
 				p={8}
@@ -57,7 +57,7 @@ const Login = () => {
 							mb={6}
 						/>
 						<Button colorScheme={'yellow'} type={'submit'}>
-							Login
+							LOGIN
 						</Button>
 					</Flex>
 				</FormControl>
