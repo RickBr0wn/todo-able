@@ -20,7 +20,7 @@ const Signup = () => {
 	const isDarkMode = colorMode === 'dark'
 
 	return (
-		<Flex justify={'center'} align={'center'} h={'calc(100vh - 72px)'}>
+		<Flex justify={'center'} align={'center'} h={'100vh'}>
 			<Flex
 				data-testid='login-container'
 				bg={isDarkMode ? 'brand.paper.dark' : 'brand.paper.light'}

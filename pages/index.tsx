@@ -1,11 +1,18 @@
+import { Flex, Text } from '@chakra-ui/react'
 import type { NextPage } from 'next'
-import Signup from './signup'
 
 const Home: NextPage = () => {
 	return (
-		<main role='main'>
-			<Signup />
-		</main>
+		<Flex
+			role='main'
+			h={'100vh'}
+			w={'100vw'}
+			justify={'center'}
+			align={'center'}
+		>
+			<Text>Home</Text>
+			<Text>This page should be visable by all.</Text>
+		</Flex>
 	)
 }
 
