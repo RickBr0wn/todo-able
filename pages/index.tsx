@@ -1,10 +1,10 @@
 import type { NextPage } from 'next'
-import Welcome from '../components/Welcome'
+import Login from './login'
 
 const Home: NextPage = () => {
 	return (
 		<main role='main'>
-			<Welcome />
+			<Login />
 		</main>
 	)
 }
