@@ -11,10 +11,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRef } from 'react'
 
-const Login = () => {
+const Signup = () => {
 	const emailRef = useRef<HTMLInputElement>(null)
 	const passwordRef = useRef<HTMLInputElement>(null)
 	const confirmPasswordRef = useRef<HTMLInputElement>(null)
+	const displayNameRef = useRef<HTMLInputElement>(null)
 	const { colorMode } = useColorMode()
 	const isDarkMode = colorMode === 'dark'
 
@@ -31,7 +32,7 @@ const Login = () => {
 				shadow={'lg'}
 			>
 				<Flex gap={4} justify={'space-between'}>
-					<Heading role={'heading'}>Login</Heading>
+					<Heading role={'heading'}>Sign Up</Heading>
 					<Image
 						src={'/../public/logo.png'}
 						alt={'logo'}
@@ -43,6 +44,7 @@ const Login = () => {
 				<FormControl>
 					<Flex flexDir={'column'} gap={5}>
 						<Input ref={emailRef} placeholder={'Email'} />
+						<Input ref={displayNameRef} placeholder={'Display Name'} />
 						<Input
 							data-testid={'password'}
 							ref={passwordRef}
@@ -57,23 +59,16 @@ const Login = () => {
 							mb={6}
 						/>
 						<Button colorScheme={'yellow'} type={'submit'}>
-							LOGIN
+							SIGN UP
 						</Button>
 					</Flex>
 				</FormControl>
-				<Text fontSize={'xs'} mt={'-20px'} align={'center'}>
-					Forgot Password?{' '}
-					<Text as={'span'} color={'yellow.300'}>
-						<Link href={'/forgot-password'}>
-							<a>Reset Password</a>
-						</Link>
-					</Text>
-				</Text>
+
 				<Text fontSize={'xs'} align={'center'} mt={'-20px'}>
-					Need an account?{' '}
+					Already have an account?{' '}
 					<Text as={'span'} color={'yellow.300'}>
-						<Link href={'/signup'}>
-							<a>Sign Up</a>
+						<Link href={'/login'}>
+							<a>Log In</a>
 						</Link>
 					</Text>
 				</Text>
@@ -82,4 +77,4 @@ const Login = () => {
 	)
 }
 
-export default Login
+export default Signup

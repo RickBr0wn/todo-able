@@ -3,7 +3,13 @@ import ToggleLightDark from './ToggleLightDark'
 
 const Navbar = () => {
 	return (
-		<Flex as={'nav'} role={'navigation'} width={'100%'} padding={4}>
+		<Flex
+			as={'nav'}
+			role={'navigation'}
+			width={'100%'}
+			padding={4}
+			pos={'fixed'}
+		>
 			<Spacer />
 			<ToggleLightDark />
 		</Flex>
