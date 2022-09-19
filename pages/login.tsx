@@ -9,7 +9,9 @@ import {
 } from '@chakra-ui/react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRef } from 'react'
+import { FormEvent, useRef, useState } from 'react'
+import { useRouter } from 'next/router'
+import { useAuth } from '../contexts/authContext'
 
 const Login = () => {
 	const emailRef = useRef<HTMLInputElement>(null)
@@ -17,6 +19,28 @@ const Login = () => {
 	const confirmPasswordRef = useRef<HTMLInputElement>(null)
 	const { colorMode } = useColorMode()
 	const isDarkMode = colorMode === 'dark'
+	const [error, setError] = useState<string>('')
+	const [isLoading, setIsLoading] = useState<boolean>(false)
+
+	const { login } = useAuth()
+	const router = useRouter()
+
+	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
+
+		try {
+			setError('')
+			setIsLoading(true)
+			if (emailRef.current && passwordRef.current) {
+				await login(emailRef.current?.value, passwordRef.current?.value)
+			}
+			router.push('/admin')
+		} catch (error) {
+			setError('Failed to sign in')
+		}
+
+		setIsLoading(false)
+	}
 
 	return (
 		<Flex justify={'center'} align={'center'} h={'100vh'}>
@@ -41,25 +65,35 @@ const Login = () => {
 					/>
 				</Flex>
 				<FormControl>
-					<Flex flexDir={'column'} gap={5}>
-						<Input ref={emailRef} placeholder={'Email'} />
-						<Input
-							data-testid={'password'}
-							ref={passwordRef}
-							placeholder={'Password'}
-							type={'password'}
-						/>
-						<Input
-							data-testid={'confirm-password'}
-							ref={confirmPasswordRef}
-							placeholder={'Confirm Password'}
-							type={'password'}
-							mb={6}
-						/>
-						<Button colorScheme={'yellow'} type={'submit'}>
-							LOGIN
-						</Button>
-					</Flex>
+					<form onSubmit={handleSubmit}>
+						<Flex flexDir={'column'} gap={5}>
+							<Input ref={emailRef} placeholder={'Email'} />
+							<Input
+								data-testid={'password'}
+								ref={passwordRef}
+								placeholder={'Password'}
+								type={'password'}
+							/>
+							<Input
+								data-testid={'confirm-password'}
+								ref={confirmPasswordRef}
+								placeholder={'Confirm Password'}
+								type={'password'}
+								mb={6}
+							/>
+							<Button
+								isLoading={isLoading}
+								loadingText='LOADING'
+								colorScheme={'yellow'}
+								type={'submit'}
+							>
+								LOGIN
+							</Button>
+						</Flex>
+					</form>
+					<Text align={'center'}>
+						{error && <p style={{ color: 'red', marginTop: '4px' }}>{error}</p>}
+					</Text>
 				</FormControl>
 				<Text fontSize={'xs'} mt={'-20px'} align={'center'}>
 					Forgot Password?{' '}

@@ -1,6 +1,18 @@
 import { Flex, Text } from '@chakra-ui/react'
+import { useAuth } from '../contexts/authContext'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 const Admin = () => {
+	const router = useRouter()
+	const { user } = useAuth()
+
+	useEffect(() => {
+		if (!user) {
+			router.push('/login')
+		}
+	}, [router, user])
+
 	return (
 		<Flex
 			h={'100vh'}
