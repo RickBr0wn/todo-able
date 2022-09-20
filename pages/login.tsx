@@ -10,36 +10,19 @@ import {
 import Link from 'next/link'
 import Image from 'next/image'
 import { FormEvent, useRef, useState } from 'react'
-import { useRouter } from 'next/router'
 import { useAuth } from '../contexts/authContext'
 
 const Login = () => {
 	const emailRef = useRef<HTMLInputElement>(null)
 	const passwordRef = useRef<HTMLInputElement>(null)
-	const confirmPasswordRef = useRef<HTMLInputElement>(null)
 	const { colorMode } = useColorMode()
 	const isDarkMode = colorMode === 'dark'
-	const [error, setError] = useState<string>('')
-	const [isLoading, setIsLoading] = useState<boolean>(false)
 
-	const { login } = useAuth()
-	const router = useRouter()
+	const { error, isLoading, login } = useAuth()
 
-	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-
-		try {
-			setError('')
-			setIsLoading(true)
-			if (emailRef.current && passwordRef.current) {
-				await login(emailRef.current?.value, passwordRef.current?.value)
-			}
-			router.push('/admin')
-		} catch (error) {
-			setError('Failed to sign in')
-		}
-
-		setIsLoading(false)
+		login(emailRef.current?.value || '', passwordRef.current?.value || '')
 	}
 
 	return (
@@ -73,13 +56,6 @@ const Login = () => {
 								ref={passwordRef}
 								placeholder={'Password'}
 								type={'password'}
-							/>
-							<Input
-								data-testid={'confirm-password'}
-								ref={confirmPasswordRef}
-								placeholder={'Confirm Password'}
-								type={'password'}
-								mb={6}
 							/>
 							<Button
 								isLoading={isLoading}

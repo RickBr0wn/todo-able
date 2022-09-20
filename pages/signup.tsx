@@ -12,7 +12,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { FormEvent, useRef, useState } from 'react'
 import { useAuth } from '../contexts/authContext'
-import { useRouter } from 'next/router'
 
 const Signup = () => {
 	const emailRef = useRef<HTMLInputElement>(null)
@@ -21,38 +20,16 @@ const Signup = () => {
 	const displayNameRef = useRef<HTMLInputElement>(null)
 	const { colorMode } = useColorMode()
 	const isDarkMode = colorMode === 'dark'
-	const { signup } = useAuth()
-	const [error, setError] = useState<string>('')
-	const [isLoading, setIsLoading] = useState<boolean>(false)
-	const router = useRouter()
+	const { error, isLoading, signUp } = useAuth()
 
-	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-
-		if (emailRef.current?.value === '') {
-			return setError('A valid email is required.')
-		}
-
-		if (displayNameRef.current?.value === '') {
-			return setError('Display name is required.')
-		}
-
-		if (passwordRef.current?.value !== confirmPasswordRef.current?.value) {
-			return setError('Passwords do not match.')
-		}
-
-		try {
-			setError('')
-			setIsLoading(true)
-			if (emailRef.current && passwordRef.current) {
-				await signup(emailRef.current.value, passwordRef.current.value)
-			}
-			router.push('/admin')
-		} catch (error) {
-			setError('Failed to create an account.')
-		}
-
-		setIsLoading(false)
+		signUp(
+			emailRef.current?.value || '',
+			displayNameRef.current?.value || '',
+			passwordRef.current?.value || '',
+			confirmPasswordRef.current?.value || ''
+		)
 	}
 
 	return (

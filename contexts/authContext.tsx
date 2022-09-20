@@ -14,14 +14,21 @@ import {
 	signOut,
 	updateEmail,
 	updatePassword,
-	User,
-	UserCredential
+	User
 } from 'firebase/auth'
+import { useRouter } from 'next/router'
 
-interface _AuthContextData {
+interface _AuthContextValue {
 	user: User | null
-	signup: (email: string, password: string) => Promise<UserCredential>
-	login: (email: string, password: string) => Promise<UserCredential>
+	isLoading: boolean
+	error: string
+	signUp: (
+		email: string,
+		displayName: string,
+		password: string,
+		confirmPassword: string
+	) => Promise<void>
+	login: (email: string, password: string) => Promise<void>
 	logout(): Promise<void>
 	resetUserPassword(email: string): Promise<void>
 	updateUserEmail: (email: string) => Promise<void> | undefined
@@ -32,9 +39,9 @@ interface _ContextProviderProps {
 	children: ReactNode
 }
 
-const AuthContext = createContext<_AuthContextData>({} as _AuthContextData)
+const AuthContext = createContext<_AuthContextValue>({} as _AuthContextValue)
 
-export function useAuth(): _AuthContextData {
+export function useAuth(): _AuthContextValue {
 	const context = useContext(AuthContext)
 	if (!context) {
 		throw new Error('useAuth must be used within an AuthProvider')
@@ -44,26 +51,85 @@ export function useAuth(): _AuthContextData {
 
 export function AuthProvider({ children }: _ContextProviderProps): JSX.Element {
 	const [user, setUser] = useState<User | null>(null)
-	const [loading, setLoading] = useState<boolean>(true)
+	const [isLoading, setIsLoading] = useState<boolean>(true)
+	const [error, setError] = useState<string>('')
+
+	const router = useRouter()
 
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, user => {
 			setUser(user)
-			setLoading(false)
+			setIsLoading(false)
+			setError('')
 		})
 		return unsubscribe
 	}, [])
 
-	function signup(email: string, password: string): Promise<UserCredential> {
-		return createUserWithEmailAndPassword(auth, email, password)
+	async function signUp(
+		email: string,
+		displayName: string,
+		password: string,
+		confirmPassword: string
+	): Promise<void> {
+		if (email === '') {
+			return setError('A valid email is required.')
+		}
+
+		if (displayName === '') {
+			return setError('Display name is required.')
+		}
+
+		if (password === '') {
+			return setError('A password is required.')
+		}
+
+		if (confirmPassword === '') {
+			return setError('A confirmation password is required.')
+		}
+
+		if (password !== confirmPassword) {
+			return setError('Passwords do not match.')
+		}
+
+		try {
+			setError('')
+			setIsLoading(true)
+			if (email && password) {
+				await createUserWithEmailAndPassword(auth, email, password)
+			}
+			router.push('/admin')
+		} catch (error) {
+			return setError('Failed to create an account.')
+		}
+
+		setIsLoading(false)
 	}
 
-	function login(email: string, password: string): Promise<UserCredential> {
-		return signInWithEmailAndPassword(auth, email, password)
+	async function login(email: string, password: string) {
+		if (email === '') {
+			return setError('A valid email is required.')
+		}
+
+		if (password === '') {
+			return setError('A password is required.')
+		}
+
+		try {
+			setError('')
+			setIsLoading(true)
+
+			await signInWithEmailAndPassword(auth, email, password)
+
+			router.push('/admin')
+		} catch (error) {
+			setError('Failed to sign in')
+		}
+
+		setIsLoading(false)
 	}
 
-	function logout(): Promise<void> {
-		return signOut(auth)
+	async function logout(): Promise<void> {
+		await signOut(auth)
 	}
 
 	function resetUserPassword(email: string): Promise<void> {
@@ -80,19 +146,21 @@ export function AuthProvider({ children }: _ContextProviderProps): JSX.Element {
 		return updatePassword(user, password)
 	}
 
-	const value = {
+	const value: _AuthContextValue = {
 		login,
 		logout,
 		resetUserPassword,
-		signup,
+		signUp,
 		updateUserEmail,
 		updateUserPassword,
-		user
+		user,
+		isLoading,
+		error
 	}
 
 	return (
 		<AuthContext.Provider value={value}>
-			{!loading && children}
+			{!isLoading && children}
 		</AuthContext.Provider>
 	)
 }
