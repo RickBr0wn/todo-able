@@ -105,7 +105,7 @@ export function AuthProvider({ children }: _ContextProviderProps): JSX.Element {
 		setIsLoading(false)
 	}
 
-	async function login(email: string, password: string) {
+	async function login(email: string, password: string): Promise<void> {
 		if (email === '') {
 			return setError('A valid email is required.')
 		}
