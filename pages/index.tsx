@@ -9,6 +9,7 @@ const Home: NextPage = () => {
 			w={'100vw'}
 			justify={'center'}
 			align={'center'}
+			flexDir={'column'}
 		>
 			<Text>Home</Text>
 			<Text>This page should be visable by all.</Text>
