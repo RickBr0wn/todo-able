@@ -81,11 +81,8 @@ const Admin = () => {
 					borderRadius={'lg'}
 				>
 					<UnorderedList w={'100%'} m={0} mb={20}>
-						{todos.map(todo => (
-							<ListItem
-								key={todo.id || `key:${Math.random()}`}
-								listStyleType={'none'}
-							>
+						{todos.map((todo: _Todo) => (
+							<ListItem key={todo.id} listStyleType={'none'}>
 								<TodoItem todo={todo} />
 							</ListItem>
 						))}
@@ -132,7 +129,7 @@ const TodoItem = function ({ todo }: _TodoItemProps): JSX.Element {
 					as={MdDeleteForever}
 					opacity={0.4}
 					_hover={{ opacity: 1, cursor: 'pointer', color: 'red.500' }}
-					onClick={() => removeTodo(todo.id)}
+					onClick={() => removeTodo(todo)}
 				/>
 			</Flex>
 		</Flex>

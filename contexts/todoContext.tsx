@@ -6,13 +6,19 @@ import {
 	useState
 } from 'react'
 import { db } from '../lib/firebase.config'
-import { addDoc, collection, doc, onSnapshot, setDoc } from 'firebase/firestore'
+import {
+	addDoc,
+	collection,
+	deleteDoc,
+	doc,
+	onSnapshot,
+	setDoc
+} from 'firebase/firestore'
 import { useAuth } from './authContext'
 
 export interface _Todo {
 	id: string
 	title: string
-	author: string
 	completed: boolean
 }
 
@@ -21,7 +27,7 @@ interface _TodoContextData {
 	isLoading: boolean
 	error: string
 	addTodo: (todo: string) => Promise<void>
-	removeTodo: (id: string) => void
+	removeTodo: (todo: _Todo) => Promise<void>
 	updateTodo: (todo: _Todo) => void
 	clearTodos: () => void
 }
@@ -54,7 +60,12 @@ export function TodoProvider({ children }: _ContextProviderProps): JSX.Element {
 		const unsubscribe = onSnapshot(
 			collectionReference,
 			querySnapshot => {
-				const todos = querySnapshot.docs.map(doc => doc.data() as _Todo)
+				// const todos = querySnapshot.docs.map(doc => doc.data() as _Todo)
+				const todos = querySnapshot.docs.map(doc => ({
+					id: doc.id,
+					...doc.data()
+				})) as _Todo[]
+
 				setTodos(todos)
 			},
 			error => console.log('error: ' + error)
@@ -84,8 +95,13 @@ export function TodoProvider({ children }: _ContextProviderProps): JSX.Element {
 		}
 	}
 
-	function removeTodo(id: string): void {
-		setTodos(todos.filter((t: _Todo) => t.id !== id))
+	async function removeTodo(todo: _Todo): Promise<void> {
+		if (!user) {
+			return
+		}
+
+		const documentReference = doc(db, user.uid, todo.id)
+		await deleteDoc(documentReference)
 	}
 
 	function updateTodo(todo: _Todo): void {
