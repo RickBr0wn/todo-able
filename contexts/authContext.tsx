@@ -5,7 +5,7 @@ import {
 	useEffect,
 	useState
 } from 'react'
-import { auth } from '../lib/firebase.config'
+import { auth, db } from '../lib/firebase.config'
 import {
 	createUserWithEmailAndPassword,
 	onAuthStateChanged,
@@ -17,6 +17,7 @@ import {
 	User
 } from 'firebase/auth'
 import { useRouter } from 'next/router'
+import { addDoc, collection, doc, setDoc } from 'firebase/firestore'
 
 interface _AuthContextValue {
 	user: User | null
@@ -30,6 +31,7 @@ interface _AuthContextValue {
 	) => Promise<void>
 	login: (email: string, password: string) => Promise<void>
 	logout(): Promise<void>
+	// populateUsersCollection(): Promise<void>
 	resetUserPassword(email: string): Promise<void>
 	updateUserEmail: (email: string) => Promise<void> | undefined
 	updateUserPassword(password: string): Promise<void> | undefined
@@ -57,11 +59,17 @@ export function AuthProvider({ children }: _ContextProviderProps): JSX.Element {
 	const router = useRouter()
 
 	useEffect(() => {
-		const unsubscribe = onAuthStateChanged(auth, user => {
-			setUser(user)
-			setIsLoading(false)
-			setError('')
-		})
+		const unsubscribe = onAuthStateChanged(
+			auth,
+			user => {
+				setUser(user)
+				setIsLoading(false)
+				setError('')
+			},
+			error => {
+				setError('Error in onAuthStateChanged: ' + error.message)
+			}
+		)
 		return unsubscribe
 	}, [])
 
@@ -94,11 +102,11 @@ export function AuthProvider({ children }: _ContextProviderProps): JSX.Element {
 		try {
 			setError('')
 			setIsLoading(true)
-			if (email && password) {
-				await createUserWithEmailAndPassword(auth, email, password)
-			}
+			await createUserWithEmailAndPassword(auth, email, password)
+			// await populateUsersCollection()
 			router.push('/admin')
 		} catch (error) {
+			console.log('error: ', error)
 			return setError('Failed to create an account.')
 		}
 
@@ -128,6 +136,23 @@ export function AuthProvider({ children }: _ContextProviderProps): JSX.Element {
 		setIsLoading(false)
 	}
 
+	// async function populateUsersCollection(): Promise<void> {
+	// 	console.log('fired')
+	// 	try {
+	// 		console.log('try')
+	// 		const collectionReference = collection(db, 'users')
+
+	// 		const response = await addDoc(collectionReference, {
+	// 			email: 'xxx@xxx.com',
+	// 			username: 'xxx'
+	// 		})
+	// 		console.log('response: ' + response)
+	// 		console.log('after await')
+	// 	} catch (error) {
+	// 		setError('error populating: ' + error)
+	// 	}
+	// }
+
 	async function logout(): Promise<void> {
 		await signOut(auth)
 	}
@@ -149,6 +174,7 @@ export function AuthProvider({ children }: _ContextProviderProps): JSX.Element {
 	const value: _AuthContextValue = {
 		login,
 		logout,
+		// populateUsersCollection,
 		resetUserPassword,
 		signUp,
 		updateUserEmail,

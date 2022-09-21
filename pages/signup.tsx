@@ -82,6 +82,7 @@ const Signup = () => {
 							</Button>
 						</Flex>
 					</form>
+
 					<Text align={'center'}>
 						{error && <p style={{ color: 'red', marginTop: '4px' }}>{error}</p>}
 					</Text>

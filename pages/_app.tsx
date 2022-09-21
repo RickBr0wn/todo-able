@@ -4,6 +4,7 @@ import theme from '../theme'
 import Layout from '../components/Layout'
 import Head from 'next/head'
 import { AuthProvider } from '../contexts/authContext'
+import { TodoProvider } from '../contexts/todoContext'
 
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {
 	return (
@@ -38,9 +39,11 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
 			<ChakraProvider theme={theme}>
 				<ColorModeScript initialColorMode={theme.config.initialColorMode} />
 				<AuthProvider>
-					<Layout>
-						<Component {...pageProps} />
-					</Layout>
+					<TodoProvider>
+						<Layout>
+							<Component {...pageProps} />
+						</Layout>
+					</TodoProvider>
 				</AuthProvider>
 			</ChakraProvider>
 		</>
