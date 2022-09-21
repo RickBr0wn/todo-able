@@ -48,13 +48,17 @@ export function TodoProvider({ children }: _ContextProviderProps): JSX.Element {
 	const [error, setError] = useState<string>('')
 	const { user } = useAuth()
 
-	const collectionReference = collection(db, `todos/${user?.uid}/todos`)
+	const collectionReference = collection(db, `${user?.uid}/`)
 
 	useEffect(() => {
-		const unsubscribe = onSnapshot(collectionReference, querySnapshot => {
-			const todos = querySnapshot.docs.map(doc => doc.data() as _Todo)
-			setTodos(todos)
-		})
+		const unsubscribe = onSnapshot(
+			collectionReference,
+			querySnapshot => {
+				const todos = querySnapshot.docs.map(doc => doc.data() as _Todo)
+				setTodos(todos)
+			},
+			error => console.log('error: ' + error)
+		)
 
 		return unsubscribe
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -72,6 +76,7 @@ export function TodoProvider({ children }: _ContextProviderProps): JSX.Element {
 
 		try {
 			setIsLoading(true)
+			const collectionReference = collection(db, user.uid)
 			await addDoc(collectionReference, newTodo)
 			setIsLoading(false)
 		} catch (error) {
