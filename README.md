@@ -3,10 +3,6 @@
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)]()
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
 
-<p align="center">
-<img  src="./public/Screenshot.png" alt="drawing" width="500" />
-</p>
-
 ## ⚡️ Quick Start
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/project?template=https://github.com/RickBr0wn/next-typescript-chakra-ui-starter)
