@@ -14,9 +14,11 @@ import {
 	signOut,
 	updateEmail,
 	updatePassword,
+	updateProfile,
 	User
 } from 'firebase/auth'
 import { useRouter } from 'next/router'
+import { useToast } from '@chakra-ui/react'
 
 interface _AuthContextValue {
 	user: User | null
@@ -55,6 +57,7 @@ export function AuthProvider({ children }: _ContextProviderProps): JSX.Element {
 	const [error, setError] = useState<string>('')
 
 	const router = useRouter()
+	const toast = useToast()
 
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(
@@ -100,8 +103,21 @@ export function AuthProvider({ children }: _ContextProviderProps): JSX.Element {
 		try {
 			setError('')
 			setIsLoading(true)
-			await createUserWithEmailAndPassword(auth, email, password)
-			// await populateUsersCollection()
+			const credentials = await createUserWithEmailAndPassword(
+				auth,
+				email,
+				password
+			)
+			await updateProfile(credentials.user, { displayName })
+
+			toast({
+				title: 'Account created.',
+				description: `We've created your account for you.`,
+				status: 'success',
+				duration: 3000,
+				isClosable: true
+			})
+
 			router.push('/admin')
 		} catch (error) {
 			return setError('Failed to create an account.')
@@ -125,6 +141,14 @@ export function AuthProvider({ children }: _ContextProviderProps): JSX.Element {
 
 			await signInWithEmailAndPassword(auth, email, password)
 
+			toast({
+				title: 'Logged In.',
+				description: `Welcome back, ${email}.`,
+				status: 'success',
+				duration: 3000,
+				isClosable: true
+			})
+
 			router.push('/admin')
 		} catch (error) {
 			setError('Failed to sign in')
@@ -134,6 +158,13 @@ export function AuthProvider({ children }: _ContextProviderProps): JSX.Element {
 	}
 
 	async function logout(): Promise<void> {
+		toast({
+			title: 'Logged Out.',
+			description: `You've been logged out.`,
+			status: 'success',
+			duration: 3000,
+			isClosable: true
+		})
 		await signOut(auth)
 	}
 

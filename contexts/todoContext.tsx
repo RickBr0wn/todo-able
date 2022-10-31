@@ -15,21 +15,15 @@ import {
 	setDoc
 } from 'firebase/firestore'
 import { useAuth } from './authContext'
-
-export interface _Todo {
-	id: string
-	title: string
-	completed: boolean
-}
+import { useToast } from '@chakra-ui/react'
 
 interface _TodoContextData {
 	todos: _Todo[]
 	isLoading: boolean
 	error: string
 	addTodo: (todo: string) => Promise<void>
+	completeTodo: (todo: _Todo) => void
 	removeTodo: (todo: _Todo) => Promise<void>
-	updateTodo: (todo: _Todo) => void
-	clearTodos: () => void
 }
 
 interface _ContextProviderProps {
@@ -53,6 +47,8 @@ export function TodoProvider({ children }: _ContextProviderProps): JSX.Element {
 	const [isLoading, setIsLoading] = useState<boolean>(false)
 	const [error, setError] = useState<string>('')
 	const { user } = useAuth()
+
+	const toast = useToast()
 
 	const collectionReference = collection(db, `${user?.uid}/`)
 
@@ -87,7 +83,7 @@ export function TodoProvider({ children }: _ContextProviderProps): JSX.Element {
 
 		try {
 			setIsLoading(true)
-			const collectionReference = collection(db, user.uid)
+			// const collectionReference = collection(db, user.uid)
 			await addDoc(collectionReference, newTodo)
 			setIsLoading(false)
 		} catch (error) {
@@ -104,12 +100,18 @@ export function TodoProvider({ children }: _ContextProviderProps): JSX.Element {
 		await deleteDoc(documentReference)
 	}
 
-	function updateTodo(todo: _Todo): void {
-		setTodos(todos.map((t: _Todo) => (t.id === todo.id ? todo : t)))
-	}
+	async function completeTodo(todo: _Todo): Promise<void> {
+		if (!user) {
+			return
+		}
 
-	function clearTodos(): void {
-		setTodos([])
+		const documentReference = doc(db, user.uid, todo.id)
+
+		await setDoc(
+			documentReference,
+			{ completed: !todo.completed },
+			{ merge: true }
+		)
 	}
 
 	const value: _TodoContextData = {
@@ -117,9 +119,8 @@ export function TodoProvider({ children }: _ContextProviderProps): JSX.Element {
 		isLoading,
 		error,
 		addTodo,
-		removeTodo,
-		updateTodo,
-		clearTodos
+		completeTodo,
+		removeTodo
 	}
 
 	return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>

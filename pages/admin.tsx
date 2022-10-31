@@ -1,19 +1,23 @@
-import { FormEvent, useEffect, useRef, useState } from 'react'
+import { FormEvent, useEffect, useRef } from 'react'
 import {
 	Button,
 	Flex,
 	FormControl,
-	Icon,
 	Input,
 	ListItem,
+	Tabs,
+	TabList,
+	TabPanels,
+	Tab,
+	TabPanel,
 	Text,
 	UnorderedList,
 	useColorMode
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useAuth } from '../contexts/authContext'
-import { useTodo, _Todo } from '../contexts/todoContext'
-import { MdDeleteForever, MdEdit, MdDone } from 'react-icons/md'
+import { useTodo } from '../contexts/todoContext'
+import { TodoItem } from '../components/TodoItem'
 
 const Admin = () => {
 	const router = useRouter()
@@ -22,6 +26,8 @@ const Admin = () => {
 	const todoRef = useRef<HTMLInputElement>(null)
 	const { colorMode } = useColorMode()
 	const isDarkMode = colorMode === 'dark'
+	const uncompletedTodos: number = todos.filter(todo => !todo.completed).length
+	const completedTodos: number = todos.filter(todo => todo.completed).length
 
 	useEffect(() => {
 		if (!user) {
@@ -38,12 +44,40 @@ const Admin = () => {
 		}
 	}
 
+	const getGreeting = () => {
+		const displayName = user?.displayName || ''
+		const capitalisedDisplayName =
+			displayName.charAt(0).toUpperCase() + displayName.slice(1)
+
+		const hour = new Date().getHours()
+		if (hour < 12) {
+			return `Good Morning ${capitalisedDisplayName}`
+		} else if (hour < 18) {
+			return `Good Afternoon ${capitalisedDisplayName}`
+		} else {
+			return `Good Evening${capitalisedDisplayName ? ' ' : ','}${
+				capitalisedDisplayName ? capitalisedDisplayName + ',' : ''
+			}`
+		}
+	}
+
+	const amountOfTodos = () => {
+		if (uncompletedTodos === 0) {
+			return "You don't have any to-do's. Why not add one?"
+		} else if (uncompletedTodos === 1) {
+			return 'You only have 1 to-do left. Nearly there!'
+		} else {
+			return `You have ${uncompletedTodos} todos left. You can do it!`
+		}
+	}
+
 	return (
 		<Flex w={'100vw'} h={'100vh'} justify='center'>
 			<Flex w={400} flexDir={'column'}>
 				<Flex
 					flexDir={'column'}
 					bg={isDarkMode ? 'brand.paper.dark' : 'brand.paper.light'}
+					shadow={'lg'}
 					borderRadius={'lg'}
 					p={10}
 					justify={'center'}
@@ -51,8 +85,11 @@ const Admin = () => {
 					mt={16}
 				>
 					<Flex flexDir={'column'} mb={6}>
-						<Text fontSize={'3xl'}>Good Afternoon..</Text>
-						<Text>{`You have ${todos.length} todos to complete.`}</Text>
+						<Text fontSize={'3xl'}>{getGreeting()}</Text>
+						<Text>{amountOfTodos()}</Text>
+						<Text as='i' fontSize='xs' opacity={0.3}>
+							Completed: {completedTodos}
+						</Text>
 					</Flex>
 
 					<Flex>
@@ -75,62 +112,55 @@ const Admin = () => {
 					</Flex>
 				</Flex>
 				<Flex
-					overflowY={'scroll'}
 					mt={6}
 					flexDir={'column'}
 					borderRadius={'lg'}
+					overflowY={'scroll'}
 				>
-					<UnorderedList w={'100%'} m={0} mb={20}>
-						{todos.map((todo: _Todo) => (
-							<ListItem key={todo.id} listStyleType={'none'}>
-								<TodoItem todo={todo} />
-							</ListItem>
-						))}
-					</UnorderedList>
+					<Tabs isFitted width={400} colorScheme='yellow'>
+						<TabList>
+							<Tab>To-Do</Tab>
+							<Tab>Completed</Tab>
+							<Tab>All</Tab>
+						</TabList>
+
+						<TabPanels>
+							<TabPanel>
+								<UnorderedList w={'100%'} m={0} mb={20}>
+									{todos
+										.filter((todo: _Todo) => !todo.completed)
+										.map((todo: _Todo) => (
+											<ListItem key={todo.id} listStyleType={'none'}>
+												<TodoItem todo={todo} />
+											</ListItem>
+										))}
+								</UnorderedList>
+							</TabPanel>
+
+							<TabPanel>
+								<UnorderedList w={'100%'} m={0} mb={20}>
+									{todos
+										.filter((todo: _Todo) => todo.completed)
+										.map((todo: _Todo) => (
+											<ListItem key={todo.id} listStyleType={'none'}>
+												<TodoItem todo={todo} />
+											</ListItem>
+										))}
+								</UnorderedList>
+							</TabPanel>
+
+							<TabPanel>
+								<UnorderedList w={'100%'} m={0} mb={20}>
+									{todos.map((todo: _Todo) => (
+										<ListItem key={todo.id} listStyleType={'none'}>
+											<TodoItem todo={todo} />
+										</ListItem>
+									))}
+								</UnorderedList>
+							</TabPanel>
+						</TabPanels>
+					</Tabs>
 				</Flex>
-			</Flex>
-		</Flex>
-	)
-}
-
-interface _TodoItemProps {
-	todo: _Todo
-}
-
-const TodoItem = function ({ todo }: _TodoItemProps): JSX.Element {
-	const { removeTodo } = useTodo()
-	const { colorMode } = useColorMode()
-	const isDarkMode = colorMode === 'dark'
-
-	return (
-		<Flex
-			bg={isDarkMode ? 'brand.paper.dark' : 'brand.paper.light'}
-			padding={6}
-			borderRadius={'lg'}
-			mb={2}
-			w={'100%'}
-			justify={'space-between'}
-			align={'center'}
-		>
-			{todo.title}
-
-			<Flex gap={3}>
-				<Icon
-					as={MdDone}
-					opacity={0.4}
-					_hover={{ opacity: 1, cursor: 'pointer', color: 'green.500' }}
-				/>
-				<Icon
-					as={MdEdit}
-					opacity={0.4}
-					_hover={{ opacity: 1, cursor: 'pointer', color: 'yellow.500' }}
-				/>
-				<Icon
-					as={MdDeleteForever}
-					opacity={0.4}
-					_hover={{ opacity: 1, cursor: 'pointer', color: 'red.500' }}
-					onClick={() => removeTodo(todo)}
-				/>
 			</Flex>
 		</Flex>
 	)
