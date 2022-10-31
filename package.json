@@ -17,11 +17,14 @@
 		"@chakra-ui/react": "^2.3.2",
 		"@emotion/react": "^11.10.4",
 		"@emotion/styled": "^11.10.4",
+		"@types/firebase": "^3.2.1",
+		"firebase": "^9.10.0",
 		"framer-motion": "^7.3.2",
 		"jest-environment-jsdom": "^29.0.3",
 		"next": "12.3.0",
 		"react": "18.2.0",
 		"react-dom": "18.2.0",
+		"react-icons": "^4.4.0",
 		"ts-node": "^10.9.1"
 	},
 	"devDependencies": {

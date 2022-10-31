@@ -3,6 +3,8 @@ import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
 import theme from '../theme'
 import Layout from '../components/Layout'
 import Head from 'next/head'
+import { AuthProvider } from '../contexts/authContext'
+import { TodoProvider } from '../contexts/todoContext'
 
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {
 	return (
@@ -36,9 +38,13 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
 
 			<ChakraProvider theme={theme}>
 				<ColorModeScript initialColorMode={theme.config.initialColorMode} />
-				<Layout>
-					<Component {...pageProps} />
-				</Layout>
+				<AuthProvider>
+					<TodoProvider>
+						<Layout>
+							<Component {...pageProps} />
+						</Layout>
+					</TodoProvider>
+				</AuthProvider>
 			</ChakraProvider>
 		</>
 	)

@@ -4,6 +4,7 @@ import {
 	FormControl,
 	Heading,
 	Input,
+	Spinner,
 	Text,
 	useColorMode
 } from '@chakra-ui/react'
@@ -12,17 +13,23 @@ import Image from 'next/image'
 import { FormEvent, useRef, useState } from 'react'
 import { useAuth } from '../contexts/authContext'
 
-const Login = () => {
+const Signup = () => {
 	const emailRef = useRef<HTMLInputElement>(null)
 	const passwordRef = useRef<HTMLInputElement>(null)
+	const confirmPasswordRef = useRef<HTMLInputElement>(null)
+	const displayNameRef = useRef<HTMLInputElement>(null)
 	const { colorMode } = useColorMode()
 	const isDarkMode = colorMode === 'dark'
-
-	const { error, isLoading, login } = useAuth()
+	const { error, isLoading, signUp } = useAuth()
 
 	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		login(emailRef.current?.value || '', passwordRef.current?.value || '')
+		signUp(
+			emailRef.current?.value || '',
+			displayNameRef.current?.value || '',
+			passwordRef.current?.value || '',
+			confirmPasswordRef.current?.value || ''
+		)
 	}
 
 	return (
@@ -38,7 +45,7 @@ const Login = () => {
 				shadow={'lg'}
 			>
 				<Flex gap={4} justify={'space-between'}>
-					<Heading role={'heading'}>Login</Heading>
+					<Heading role={'heading'}>Sign Up</Heading>
 					<Image
 						src={'/../public/logo.png'}
 						alt={'logo'}
@@ -51,11 +58,19 @@ const Login = () => {
 					<form onSubmit={handleSubmit}>
 						<Flex flexDir={'column'} gap={5}>
 							<Input ref={emailRef} placeholder={'Email'} />
+							<Input ref={displayNameRef} placeholder={'Display Name'} />
 							<Input
 								data-testid={'password'}
 								ref={passwordRef}
 								placeholder={'Password'}
 								type={'password'}
+							/>
+							<Input
+								data-testid={'confirm-password'}
+								ref={confirmPasswordRef}
+								placeholder={'Confirm Password'}
+								type={'password'}
+								mb={6}
 							/>
 							<Button
 								isLoading={isLoading}
@@ -63,27 +78,21 @@ const Login = () => {
 								colorScheme={'yellow'}
 								type={'submit'}
 							>
-								LOGIN
+								SIGN UP
 							</Button>
 						</Flex>
 					</form>
+
 					<Text align={'center'}>
 						{error && <p style={{ color: 'red', marginTop: '4px' }}>{error}</p>}
 					</Text>
 				</FormControl>
-				<Text fontSize={'xs'} mt={'-20px'} align={'center'}>
-					Forgot Password?{' '}
-					<Text as={'span'} color={'yellow.300'}>
-						<Link href={'/forgot-password'}>
-							<a>Reset Password</a>
-						</Link>
-					</Text>
-				</Text>
+
 				<Text fontSize={'xs'} align={'center'} mt={'-20px'}>
-					Need an account?{' '}
+					Already have an account?{' '}
 					<Text as={'span'} color={'yellow.300'}>
-						<Link href={'/signup'}>
-							<a>Sign Up</a>
+						<Link href={'/login'}>
+							<a>Log In</a>
 						</Link>
 					</Text>
 				</Text>
@@ -92,4 +101,4 @@ const Login = () => {
 	)
 }
 
-export default Login
+export default Signup

@@ -14,7 +14,7 @@ const colors = {
 	brand: {
 		paper: {
 			light: 'white',
-			dark: '#292B2F'
+			dark: '#36393F'
 		}
 		// 	100: 'red',
 		// 	200: 'red',
@@ -46,7 +46,7 @@ const styles = {
 		body: {
 			// example of changing both the background &
 			// foreground color based on the color mode
-			bg: mode('#F6F6F6', '#36393F')(props),
+			bg: mode('#F6F6F6', '#0c0e12')(props),
 			color: mode('#292B30', '#ffffff')(props)
 		},
 		h1: {
